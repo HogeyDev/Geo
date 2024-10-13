@@ -1,4 +1,4 @@
-use crate::io::load_gameplay;
+use crate::{io::load_gameplay, neural::network::NeuralNetwork};
 
 #[derive(Clone, Copy, Debug)]
 pub enum Block {
@@ -40,33 +40,45 @@ impl Block {
 }
 
 pub struct Generator {
-    gameplay: Vec<[Block; 10]>
+    pub gameplay: Vec<[Block; 10]>,
+    pub network: NeuralNetwork,
 }
 
 impl Generator {
     pub fn new() -> Self {
         Self {
             gameplay: Vec::new(),
+            network: NeuralNetwork::new([2, 3, 2].to_vec()),
         }
     }
     pub fn load_gameplay(&mut self, fp: &str) {
         self.gameplay = load_gameplay(fp.to_string());
     }
     pub fn run(&mut self) {
-        for _ in 0..10 {
-            self.next_row();
+        for _ in 0..1 {
+            let next_row = self.next_row();
+            self.gameplay.push(next_row);
         }
     }
-    fn next_row(&mut self) {
+    fn next_row(&mut self) -> [Block; 10] {
+        self.network.calculate();
         let mut column = [Block::Empty; 10];
         for i in 0..10 {
             column[i] = Block::from(0);
         }
-        self.gameplay.push(column);
+        column
     }
     pub fn print_gameplay(&self) {
+        let divider = format!("+{}+", "-".repeat(self.gameplay.len()));
+        println!("{divider}");
         for i in 0..10 {
-            println!("{}", self.gameplay.iter().map(|x| x[i].to_char()).collect::<String>());
+            println!("|{}|", self.gameplay.iter().map(|x| x[i].to_char()).collect::<String>());
+        }
+        println!("{divider}");
+    }
+    pub fn print_row(&self, row: [Block; 10]) {
+        for i in 0..10 {
+            println!("{}", row[i].to_char());
         }
     }
 }

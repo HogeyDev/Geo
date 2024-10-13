@@ -1,5 +1,5 @@
 [package]
-name = "gameplay_generator"
+name = "geo"
 version = "0.1.0"
 edition = "2021"
 
